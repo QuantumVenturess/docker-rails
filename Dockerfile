@@ -1,22 +1,27 @@
 FROM dangerous/ruby
 
-RUN mkdir /opt/web_app
-WORKDIR /opt/web_app
+RUN mkdir /opt/app
+WORKDIR /opt/app
 
-RUN mkdir /opt/web_app/shared
-RUN mkdir /opt/web_app/shared/log
-RUN mkdir /opt/web_app/shared/pids
+RUN mkdir /opt/app/shared
+RUN mkdir /opt/app/shared/log
+RUN mkdir /opt/app/shared/pids
 
-ADD rails_app/Gemfile /opt/web_app/Gemfile
-ADD rails_app/Gemfile.lock /opt/web_app/Gemfile.lock
+ADD code/Gemfile /opt/app/Gemfile
+ADD code/Gemfile.lock /opt/app/Gemfile.lock
 RUN /bin/bash -l -c "bundle install"
 
-ADD rails_app /opt/web_app
+ADD code /opt/app
 
-ADD config/server/start-server.sh /usr/bin/start-server
-ADD config/server/unicorn.rb /opt/web_app/config/unicorn.rb
+ADD config/start-server.sh /usr/bin/start-server
+ADD config/unicorn.rb /opt/app/config/unicorn.rb
 RUN chmod +x /usr/bin/start-server
 
+# Cleanup
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Publish port 8080
 EXPOSE 8080
 
+# Start the Unicorn server
 ENTRYPOINT /usr/bin/start-server

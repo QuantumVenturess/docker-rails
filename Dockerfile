@@ -1,5 +1,9 @@
 FROM dangerous/ruby
 
+RUN apt-get -y update
+RUN apt-get -qy install postgresql-client
+RUN apt-get -qy install libpq-dev libxml2-dev libxslt-dev
+
 RUN mkdir /opt/app
 WORKDIR /opt/app
 
